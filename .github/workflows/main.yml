@@ -1,0 +1,67 @@
+name: Auto Render Mystery HQ Video
+
+on:
+  repository_dispatch:
+    types: [render_and_upload]
+  workflow_dispatch:
+
+# 👇 YEH BLOCK ADD KIYA GAYA HAI (Releases create karne ki permission) 👇
+permissions:
+  contents: write
+
+jobs:
+  build_video:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60 # Reduced timeout since async rendering is super fast
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install System Dependencies (FFmpeg)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Install Python Libraries
+        run: |
+          python -m pip install --upgrade pip
+          # Added aiohttp and edge-tts for native async support
+          pip install requests aiohttp edge-tts
+
+      - name: Run Video Rendering Script
+        env:
+          PYTHONUNBUFFERED: "1"
+          
+          # 👇 YEH LINE ADD KI GAYI HAI 👇
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+          # Payload Data from n8n Webhook
+          SCENES_DATA: ${{ github.event.client_payload.scenes_data }}
+          TITLE: ${{ github.event.client_payload.title }}
+          DESCRIPTION: ${{ github.event.client_payload.description }}
+          THUMBNAIL_PROMPT: ${{ github.event.client_payload.thumbnail_prompt }}
+          CHAT_ID: ${{ github.event.client_payload.chat_id }}
+          
+          # 👇 YAHAN SMART FALLBACK KEYWORDS ADD KIYA GAYA HAI 👇
+          FALLBACK_KEYWORDS: ${{ github.event.client_payload.fallback_keywords }}
+          
+          # Repository Secrets
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }} 
+          
+        run: python render_video.py
+
+      # 👇 NAYA AUTO-DELETE BLOCK YAHAN HAI 👇
+      - name: Auto-delete older releases
+        uses: dev-drprasad/delete-older-releases@v0.3.3
+        with:
+          keep_latest: 3
+          delete_tags: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
