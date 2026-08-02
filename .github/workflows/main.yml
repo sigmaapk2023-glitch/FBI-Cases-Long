@@ -1,4 +1,4 @@
-name: Auto Render Mystery HQ Video
+name: Auto Render FBI Cases Video
 
 on:
   repository_dispatch:
