@@ -13,8 +13,8 @@ pexels_key = os.environ.get('PEXELS_API_KEY')
 chat_id = os.environ.get('CHAT_ID')
 telegram_token = os.environ.get('TELEGRAM_BOT_TOKEN')
 
-# 👇 Channel Watermark
-channel_name = "Mystery HQ" 
+# 👇 Channel Watermark Updated for New Channel
+channel_name = "FBI Cases" 
 
 print(f"DEBUG: Processing {len(scenes_data)} scenes async...")
 
@@ -215,8 +215,8 @@ async def main_pipeline():
         run_id = os.environ.get('GITHUB_RUN_ID', str(int(time.time())))
         tag_name = f"vid-{run_id}"
         
-        # 👇 Repo name updated as per screenshot and JSON 👇
-        repo_name = os.environ.get('GITHUB_REPOSITORY', "altersrechner-oss/Mystery-HQ-Long") 
+        # 👇 Repo name updated for FBI-Cases-Long
+        repo_name = os.environ.get('GITHUB_REPOSITORY', "sigmaapk2023-glitch/FBI-Cases-Long") 
         
         try:
             cmd = ['gh', 'release', 'create', tag_name, final_video, '--repo', repo_name, '--notes', 'Automated Video Render']
